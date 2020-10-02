@@ -6,11 +6,34 @@ import torch.nn.functional as F
 
 import numpy as np
 
-import utils
+import cerenaut_pt_core.utils as utils
 
 
 class SparseAutoencoder(nn.Module):
   """A convolutional k-Sparse autoencoder."""
+
+  @staticmethod
+  def get_default_config():
+    config = {
+      "filters": 64,
+      "kernel_size": 4,
+      "stride": 2,
+
+      "use_bias": True,
+      "use_tied_weights": True,
+      "use_lifetime_sparsity": True,
+
+      "encoder_padding": 0,
+      "decoder_padding": 0,
+
+      "encoder_nonlinearity": "leaky_relu",
+      "decoder_nonlinearity": "sigmoid",
+
+      "sparsity": 5,
+      "sparsity_output_factor": 1.0
+    }
+    return config
+
 
   def __init__(self, input_shape, config, output_shape=None):
     super(SparseAutoencoder, self).__init__()
@@ -33,6 +56,22 @@ class SparseAutoencoder(nn.Module):
 
     self.encoder_nonlinearity = utils.activation_fn(self.config['encoder_nonlinearity'])
     self.decoder_nonlinearity = utils.activation_fn(self.config['decoder_nonlinearity'])
+
+  def get_encoding_shape(self):
+    """
+    Utility function for computing output of convolutional layer
+    """
+    h = int(self.input_shape[2])
+    w = int(self.input_shape[3])
+    kernel_size = int(self.config['kernel_size'])
+    stride = int(self.config['stride'])
+    pad = int(self.config['encoder_padding'])
+    dilation = 1
+    from math import floor
+    h_enc = floor( ((h + (2 * pad) - ( dilation * (kernel_size - 1) ) - 1 )/ stride) + 1)
+    w_enc = floor( ((w + (2 * pad) - ( dilation * (kernel_size - 1) ) - 1 )/ stride) + 1)
+    f = self.config['filters']
+    return [-1, f, h_enc, w_enc]
 
   def reset_parameters(self):
     # self.apply(lambda m: utils.initialize_parameters(m, weight_init='xavier_normal_', bias_init='zeros_'))
