@@ -6,7 +6,7 @@ import torch.nn.functional as F
 
 import numpy as np
 
-import utils
+import cerenaut_pt_core.utils as utils
 
 
 class SparseAutoencoder(nn.Module):
