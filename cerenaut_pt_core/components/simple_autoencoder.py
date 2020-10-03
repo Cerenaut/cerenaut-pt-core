@@ -6,7 +6,8 @@ import torch.nn.functional as F
 
 import numpy as np
 
-import utils
+from cerenaut_pt_core import utils
+
 
 class SimpleAutoencoder(nn.Module):
   """A simple encoder-decoder network."""
