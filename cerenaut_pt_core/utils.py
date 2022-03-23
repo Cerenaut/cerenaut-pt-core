@@ -317,6 +317,8 @@ def conv2d_same(x, weight, bias=None, stride=(1, 1), padding=(0, 0), dilation=(1
   stride = (stride, stride) if isinstance(stride, int) else stride
 
   x, _ = pad_same(x, weight.shape[-2:], stride, dilation)
+  x = x.to(weight.device)
+  
   return F.conv2d(x, weight=weight, bias=bias, stride=stride, padding=padding, dilation=dilation,
                   groups=groups)
 
